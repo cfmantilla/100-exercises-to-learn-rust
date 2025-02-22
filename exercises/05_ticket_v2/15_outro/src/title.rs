@@ -2,6 +2,37 @@
 //   enforcing that the title is not empty and is not longer than 50 bytes.
 //   Implement the traits required to make the tests pass too.
 
+use thiserror::Error;
+
+impl TryFrom<String> for TicketTitle {
+    type Error = ParseError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        if value.is_empty() {
+            return Err(ParseError("The title cannot be empty".to_string()));
+        }
+        if value.len() > 50 {
+            return Err(ParseError(
+                "The title cannot be longer than 50 bytes".to_string(),
+            ));
+        }
+        Ok(TicketTitle(value))
+    }
+}
+
+impl TryFrom<&str> for TicketTitle {
+    type Error = ParseError;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        Self::try_from(value.to_owned())
+    }
+}
+
+#[derive(Debug, Error)]
+#[error("{}",.0)]
+pub struct ParseError(String);
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct TicketTitle(String);
 
 #[cfg(test)]
